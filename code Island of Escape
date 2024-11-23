@@ -38,7 +38,7 @@ void mostrar_titulo() {
     printf("y enfrentandote a los peligros del entorno.\n");
     printf("\n");
     printf("\033[1;36mNecesidades Basicas:\033[0m\n");
-    printf("- Salud: Si llega a 0, perderás el juego. Manten niveles altos de comida y agua para regenerarla.\n");
+    printf("- Salud: Si llega a 0, perderas el juego. Manten niveles altos de comida y agua para regenerarla.\n");
     printf("- Comida y Agua: Necesarias para sobrevivir y mantener tu salud en estado\n");
     printf("- Energia: Necesaria para realizar acciones como recolectar recursos o explorar. Descansa para recuperarla. \n");
     printf("\n");
