@@ -1,0 +1,425 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+typedef struct {
+    int salud;
+    int comida;
+    int agua;
+    int energia;
+    int madera;
+    int piedra;
+    int refugio;
+    int durabilidad_refugio;
+} Jugador;
+
+void mostrar_titulo() {
+    printf("\n");
+    printf("**************************************************\n");
+	printf("**************************************************\n");
+    printf("**                                              **\n");
+    printf("**              Esta por jugar                  **\n");
+    printf("**               SUPERvivencia                  **\n");
+    printf("**                                              **\n");
+    printf("**             QUE LO DISFRUTE !!               **\n");
+    printf("**                                              **\n");
+    printf("**                                              **\n");
+    printf("**  Creditos:                                   **\n");
+    printf("**     - Caminero, Valentina                    **\n");
+    printf("**     - Calderon, Macarena Jazmin              **\n");
+    printf("**     - Lencinas, Ignacio                      **\n");
+    printf("**     - Sandoval, Lautaro Emanuel              **\n");
+    printf("**                                              **\n");
+    printf("**************************************************\n");
+    printf("**************************************************\n");
+    printf("\n");
+    printf("Instrucciones básicas:\n");
+    printf("1. Recolecta recursos para construir y mantener tu refugio.\n");
+    printf("2. Explora el entorno, pero ten cuidado con los peligros.\n");
+    printf("3. Mantén tu salud, comida y agua al máximo para sobrevivir.\n");
+    printf("4. Si tienes suficiente comida y agua, tu salud puede regenerarse.\n");
+    printf("\n");
+    printf("- ¡Buena suerte!\n");
+    printf("\nPresiona cualquier tecla para comenzar...\n");
+    getchar(); // Espera que el jugador presione Enter
+}
+
+void mostrar_estado(Jugador *jugador, int hora) {
+    printf("\n\033[1;32m=== ESTADO DEL JUGADOR ===\033[0m\n"); // Color verde
+    printf("\033[1;34mSalud:\033[0m %d\n", jugador->salud);
+    printf("\033[1;33mComida:\033[0m %d\n", jugador->comida);
+    printf("\033[1;36mAgua:\033[0m %d\n", jugador->agua);
+    printf("\033[1;35mEnergía:\033[0m %d\n", jugador->energia);
+    printf("\033[1;31mMadera:\033[0m %d\n", jugador->madera);
+    printf("\033[1;37mPiedra:\033[0m %d\n", jugador->piedra);
+    printf("\033[1;33mRefugio:\033[0m %s\n", jugador->refugio ? "Construido" : "No construido");
+    if (jugador->refugio) {
+        printf("\033[1;32mDurabilidad del Refugio:\033[0m %d/100\n", jugador->durabilidad_refugio);
+    }
+    printf("Hora actual: %d:00 (%s)\n", hora, (hora >= 6 && hora < 18) ? "Día" : "Noche");
+    printf("\033[1;32m==========================\033[0m\n\n");
+}
+
+void recolectar_recursos(Jugador *jugador, int *hora) {
+    printf("\n");
+    printf("Recolectando recursos...\n");
+    int evento = rand() % 6; // Incrementado a 6 para incluir nuevas situaciones
+
+    int madera_recolectada = 0; // Inicializar valores temporales
+    int piedra_recolectada = 0;
+
+    switch (evento) {
+        case 0:
+            madera_recolectada = rand() % 6 + 2; // Entre 2 y 7 madera
+            piedra_recolectada = rand() % 4 + 1; // Entre 1 y 4 piedra
+            printf("Recolectaste: +%d madera, +%d piedra.\n", madera_recolectada, piedra_recolectada);
+            break;
+        case 1:
+            madera_recolectada = 10;
+            jugador->energia -= 5;
+            printf("Recolectaste madera de un árbol resistente: +10 madera, -5 energía.\n");
+            break;
+        case 2:
+            piedra_recolectada = 6;
+            jugador->salud -= 5;
+            printf("Recolectaste fragmentos afilados de roca: +6 piedras, pero sufriste un corte: -5 salud.\n");
+            break;
+        case 3:
+            jugador->comida += 4;
+            jugador->salud -= 5;
+            printf("Te acercaste a un nido de insectos y te picaron: -5 salud, pero conseguiste +4 comida.\n");
+            break;
+        case 4:
+            piedra_recolectada = 8;
+            jugador->energia -= 8;
+            printf("Recolectaste piedras en una cueva oscura: +8 piedras, -8 energía.\n");
+            break;
+        case 5:
+            madera_recolectada = 6;
+            piedra_recolectada = 5;
+            printf("Recolectaste eficientemente: +6 madera, +5 piedras.\n");
+            break;
+    }
+
+    // Sumar los recursos al jugador
+    jugador->madera += madera_recolectada;
+    jugador->piedra += piedra_recolectada;
+
+    // **Controlar límites máximos para evitar acumulación excesiva**
+    if (jugador->madera > 50) {
+        jugador->madera = 50; // Máximo 50 madera
+        printf("Has alcanzado el límite de madera (50).\n");
+    }
+    if (jugador->piedra > 50) {
+        jugador->piedra = 50; // Máximo 50 piedra
+        printf("Has alcanzado el límite de piedra (50).\n");
+    }
+
+    // Reducir energía y controlar límites
+    jugador->energia -= 5;
+    if (jugador->energia > 100) jugador->energia = 100; // Límite máximo de energía
+
+    *hora += 2; // Avanzar 2 horas después de recolectar
+}
+
+void construir_refugio(Jugador *jugador, int *hora) {
+    if (jugador->madera >= 20 && jugador->piedra >= 10) {
+        jugador->refugio = 1;
+        jugador->madera -= 20;
+        jugador->piedra -= 10;
+        jugador->durabilidad_refugio = 100;
+        printf("\n");
+        printf("Construiste un refugio exitosamente.\n");
+        *hora += 4;
+    } else {
+        int madera_faltante = 20 - jugador->madera;
+        int piedra_faltante = 10 - jugador->piedra;
+        printf("\n");
+        printf("No tienes suficientes recursos para construir un refugio.\n");
+        if (madera_faltante > 0) {
+            printf("Te faltan %d unidades de madera.\n", madera_faltante);
+        }
+        if (piedra_faltante > 0) {
+            printf("Te faltan %d unidades de piedra.\n", piedra_faltante);
+        }
+    }
+}
+
+void mantener_refugio(Jugador *jugador, int *hora) {
+    if (!jugador->refugio) {
+    	printf("\n");
+        printf("No tienes un refugio construido para reforzar.\n");
+        return;
+    }
+    if (jugador->madera >= 5 && jugador->piedra >= 3) {
+        jugador->madera -= 5;
+        jugador->piedra -= 3;
+        jugador->durabilidad_refugio += 20;
+        if (jugador->durabilidad_refugio > 100) jugador->durabilidad_refugio = 100;
+        printf("\n");
+        printf("Reforzaste tu refugio. Durabilidad actual: %d/100.\n", jugador->durabilidad_refugio);
+        *hora += 2;
+    } else {
+    	printf("\n");
+        printf("No tienes suficientes recursos para reforzar tu refugio.\n");
+    }
+}
+
+void explorar(Jugador *jugador, int *hora) {
+    printf("\n");
+    printf("Explorando el área...\n");
+    int evento = rand() % 10; // Incrementado a 10 para incluir nuevas situaciones
+
+    switch (evento) {
+        case 0:
+            printf("Encontraste un arroyo: +5 agua.\n");
+            jugador->agua += 5;
+            if (jugador->agua > 100) jugador->agua = 100; // Límite máximo
+            break;
+        case 1:
+            printf("Un lobo te atacó: -10 salud.\n");
+            jugador->salud -= 10;
+            break;
+        case 2:
+            printf("Encontraste frutos silvestres: +8 comida.\n");
+            jugador->comida += 8;
+            if (jugador->comida > 100) jugador->comida = 100; // Límite máximo
+            break;
+        case 3:
+            printf("Tropiezas y pierdes 5 de energía por una caída.\n");
+            jugador->energia -= 5;
+            if (jugador->energia < 0) jugador->energia = 0;
+            break;
+        case 4:
+            printf("Encuentras restos de un campamento: +10 de madera.\n");
+            jugador->madera += 10;
+            break;
+        case 5:
+            printf("Encontraste una cascada refrescante: +15 agua, -5 energía.\n");
+            jugador->agua += 15;
+            jugador->energia -= 5;
+            break;
+        case 6:
+            printf("Una serpiente te mordió: -15 salud.\n");
+            jugador->salud -= 15;
+            break;
+        case 7:
+            printf("Exploraste una cueva peligrosa: +5 piedras, pero sufriste una herida: -10 salud.\n");
+            jugador->piedra += 5;
+            jugador->salud -= 10;
+            break;
+        case 8:
+            if (rand() % 2 == 0) {
+                printf("Comiste unas frutas exóticas y estaban deliciosas: +10 comida.\n");
+                jugador->comida += 10;
+            } else {
+                printf("Comiste unas frutas exóticas y te intoxicaste: -10 salud.\n");
+                jugador->salud -= 10;
+            }
+            break;
+        case 9:
+            printf("Descubriste herramientas abandonadas: +10 madera, +5 piedras.\n");
+            jugador->madera += 10;
+            jugador->piedra += 5;
+            break;
+    }
+
+    jugador->energia -= 8;
+    if (jugador->energia < 0) jugador->energia = 0; // Evita valores negativos
+    *hora += 4;
+}
+
+void consumir_recursos(Jugador *jugador, int comida_necesaria, int agua_necesaria) {
+    if (jugador->comida < comida_necesaria) {
+    	printf("\n");
+        printf("No tienes suficiente comida, tu salud disminuye.\n");
+        jugador->salud -= (comida_necesaria - jugador->comida) * 2;
+        jugador->comida = 0;
+    } else {
+        jugador->comida -= comida_necesaria;
+    }
+
+    if (jugador->agua < agua_necesaria) {
+    	printf("\n");
+        printf("No tienes suficiente agua, tu salud disminuye.\n");
+        jugador->salud -= (agua_necesaria - jugador->agua) * 2;
+        jugador->agua = 0;
+    } else {
+        jugador->agua -= agua_necesaria;
+    }
+}
+
+void desmayarse(Jugador *jugador, int *hora) {
+    printf("\n");
+    printf("\n--- Te desmayaste por falta de energía ---\n");
+    int evento = rand() % 9; // Incrementado a 9 para incluir nuevas situaciones
+
+    switch (evento) {
+        case 0:
+            printf("Un viajero encontró tu cuerpo inconsciente y te ayudó. Recuperaste 20 de salud.\n");
+            jugador->salud += 20;
+            break;
+        case 1:
+            printf("Un animal salvaje te atacó mientras estabas inconsciente. Perdiste 15 de salud.\n");
+            jugador->salud -= 15;
+            break;
+        case 2:
+            printf("Perdiste horas dormido sin incidentes, pero desperdiciaste tiempo valioso.\n");
+            break;
+        case 3:
+            printf("No lograste despertar debido al excesivo cansancio.\n");
+            jugador->salud = 0; // Termina el juego
+            break;
+        case 4:
+            printf("Te desmayaste y alguien robó tus recursos: -10 madera, -10 piedras.\n");
+            jugador->madera -= 10;
+            jugador->piedra -= 10;
+            if (jugador->madera < 0) jugador->madera = 0;
+            if (jugador->piedra < 0) jugador->piedra = 0;
+            break;
+        case 5:
+            printf("Un extraño te encontró y te ayudó. Recuperaste 15 de salud.\n");
+            jugador->salud += 15;
+            if (jugador->salud > 100) jugador->salud = 100;
+            break;
+        case 6:
+            printf("Te desmayaste y tus suministros de comida y agua se derramaron: -10 comida, -10 agua.\n");
+            jugador->comida -= 10;
+            jugador->agua -= 10;
+            if (jugador->comida < 0) jugador->comida = 0;
+            if (jugador->agua < 0) jugador->agua = 0;
+            break;
+        case 7:
+            printf("Un animal salvaje te atacó mientras estabas inconsciente: -20 salud.\n");
+            jugador->salud -= 20;
+            break;
+        case 8:
+            printf("Tu desmayo resultó en un descanso reparador. Recuperaste 30 de energía.\n");
+            jugador->energia += 30;
+            if (jugador->energia > 100) jugador->energia = 100;
+            break;
+    }
+
+    jugador->energia += 30;
+    if (jugador->energia > 100) jugador->energia = 100;
+    *hora += 6;
+}
+
+void ciclo_dia(Jugador *jugador, int *hora) {
+    // Mostrar el estado actual del jugador antes de cualquier acción
+    mostrar_estado(jugador, *hora);
+
+    if (jugador->energia <= 0) {
+        desmayarse(jugador, hora);
+        if (jugador->salud <= 0) return;
+    }
+    
+    int accion;
+    int entrada_valida;
+
+    do {
+        // Mostrar opciones al jugador
+        printf("\033[38;5;214m1. Recolectar recursos\033[0m\n");
+        printf("\033[38;5;214m2. Construir refugio\033[0m\n");
+        printf("\033[38;5;214m3. Reforzar refugio\033[0m\n");
+        printf("\033[38;5;214m4. Explorar\033[0m\n");
+        printf("\033[38;5;214m5. Descansar\033[0m\n");
+        printf("\n");
+        printf("Selecciona una acción: ");
+        
+        entrada_valida = scanf("%d", &accion);
+        
+        // Limpiar el buffer si la entrada no es válida
+        if (entrada_valida != 1) {
+            while (getchar() != '\n'); // Limpiar el buffer de entrada
+            accion = -1; // Asignar un valor inválido para repetir el bucle
+        }
+
+        // Limpiar la pantalla ANTES de mostrar el resultado de la acción
+        #ifdef _WIN32
+            system("cls");
+        #else
+            system("clear");
+        #endif
+
+        // Procesar la acción seleccionada
+        switch (accion) {
+            case 1:
+                recolectar_recursos(jugador, hora);
+                break;
+            case 2:
+                construir_refugio(jugador, hora);
+                break;
+            case 3:
+                mantener_refugio(jugador, hora);
+                break;
+            case 4:
+                explorar(jugador, hora);
+                break;
+            case 5:
+                jugador->energia += 20;
+                if (jugador->energia > 100) jugador->energia = 100; // Límite máximo de energía
+                if (jugador->refugio) {
+                    printf("\n");
+                    printf("Mientras descansabas, un lobo intentó atacarte, pero tu refugio lo protegió.\n");
+                    jugador->durabilidad_refugio -= 10;
+                    if (jugador->durabilidad_refugio <= 0) {
+                        printf("\n");
+                        printf("Tu refugio se ha derrumbado.\n");
+                        jugador->refugio = 0;
+                    }
+                } else {
+                    printf("\n");
+                    printf("Mientras descansabas, un lobo te atacó. Perdiste 10 de salud.\n");
+                    jugador->salud -= 10;
+                }
+                *hora += 6;
+                break;
+            default:
+                printf("Acción inválida. Por favor, selecciona una opción válida.\n");
+                break;
+        }
+    } while (accion < 1 || accion > 5); // Repetir hasta que se seleccione una acción válida
+
+    // Consumir recursos y gestionar el estado del refugio después de cada acción
+    consumir_recursos(jugador, 2, 1);
+
+    if (jugador->refugio) {
+        jugador->durabilidad_refugio -= 5; // Desgaste diario del refugio
+        if (jugador->durabilidad_refugio <= 0) {
+            printf("\n");
+            printf("Tu refugio se ha derrumbado.\n");
+            jugador->refugio = 0;
+        }
+    }
+
+    // Reinicio del día si la hora supera 24
+    if (*hora >= 24) {
+        *hora = 0; // Reiniciar el día
+        printf("=== Un nuevo día comienza ===\n");
+    }
+}
+
+int main() {
+    Jugador jugador = {100, 30, 30, 100, 10, 5, 0, 0};
+    int hora = 6;
+    srand(time(NULL));
+
+    mostrar_titulo(); // Muestra el título una vez
+
+    printf("Bienvenido a SUPERvivencia.\n");
+
+    while (jugador.salud > 0) {
+        ciclo_dia(&jugador, &hora);
+
+		if (jugador.salud <= 0) {
+		    printf("\n");
+		    printf("\033[1;31mHas muerto. Fin del juego.\033[0m\n"); 
+		    printf("\n");
+		    printf("Gracias por jugar SUPERvivencia!\n");
+		    break;
+		}
+    }
+
+    return 0;
+}
