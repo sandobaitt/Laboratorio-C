@@ -16,7 +16,7 @@ typedef struct {
 void mostrar_titulo() {
     printf("\n");
     printf("**************************************************\n");
-	printf("**************************************************\n");
+    printf("**************************************************\n");
     printf("**                                              **\n");
     printf("**              Esta por jugar                  **\n");
     printf("**             Island of Escape !               **\n");
