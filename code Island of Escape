@@ -437,8 +437,6 @@ int main() {
 
     mostrar_titulo();
 
-    printf("Bienvenido a Island of Escape.\n");
-
     while (jugador.salud > 0) {
         ciclo_dia(&jugador, &hora);
 
