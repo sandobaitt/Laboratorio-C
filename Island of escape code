@@ -432,7 +432,7 @@ void ciclo_dia(Jugador *jugador, int *hora) {
 }
 
 int main() {
-    Jugador jugador = {100, 40, 40, 100, 10, 5, 0, 0};
+    Jugador jugador = {100, 50, 50, 100, 10, 5, 0, 0};
     int hora = 6;
     srand(time(NULL));
 
