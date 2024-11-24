@@ -1,1 +1,1 @@
-El codigo del juego que creamos como grupo estara disponible junto a un compilador que se uso para probarlo.
+El codigo del juego que creamos como grupo estara disponible junto a un compilador que se uso para probarlo y el archivo txt con el nombre que deja usar en el juego, pero que no es necesario para su jugabilidad.
