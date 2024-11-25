@@ -149,11 +149,11 @@ void recolectar_recursos(Jugador *jugador, int *hora) {
 
     if (jugador->madera > 50) {
         jugador->madera = 50;
-        printf("Has alcanzado el límite de madera (50).\n");
+        printf("Has alcanzado el limite de madera (50).\n");
     }
     if (jugador->piedra > 50) {
         jugador->piedra = 50;
-        printf("Has alcanzado el límite de piedra (50).\n");
+        printf("Has alcanzado el limite de piedra (50).\n");
     }
 
     jugador->energia -= 5;
@@ -510,6 +510,10 @@ int main() {
         ciclo_dia(&jugador, &hora);
 
         if (hora == 0) { 
+            printf("\n");
+        	dias_sobrevividos++;
+            printf("Has sobrevivido %d dia(s) en la isla.\n", dias_sobrevividos);
+            printf("\n");
             printf("Quieres guardar tu progreso? (1: Si, 0: No): ");
             int guardar;
             scanf("%d", &guardar);
@@ -520,7 +524,7 @@ int main() {
 
         if (jugador.salud <= 0) {
             printf("\n\033[1;31mHas muerto. Fin del juego.\033[0m\n");
-            printf("\nGracias por jugar Island of Escape!\n");
+            printf("Sobreviviste un total de %d dia(s). Gracias por jugar Island of Escape!\n", dias_sobrevividos);
             break;
         }
     }
