@@ -29,7 +29,7 @@ El juego se maneja a través de un menú numérico. Deberás elegir sabiamente t
 
 Proyecto desarrollado por:
 
-*Valentina Caminero
-*Macarena Jazmin Calderon
-*Ignacio Lencinas
-*Lautaro Emanuel Sandoval
+* Valentina Caminero
+* Macarena Jazmin Calderon
+* Ignacio Lencinas
+* Lautaro Emanuel Sandoval
